@@ -1,22 +1,22 @@
-use clap::Parser;
+use clap::{Args, Parser};
 
-#[derive(Debug, Parser)]
+#[derive(Debug, Args)]
 pub struct CreateOpts {
-    #[arg(short, long)]
+    #[arg(short = 'n', long)]
     pub name: String,
-    #[arg(short, long)]
+    #[arg(short = 'd', long)]
     pub desc: String,
-    #[arg(short, long)]
-    pub finsh_date: String,
+    #[arg(short = 'f', long)]
+    pub finish_date: String,
 }
 
-#[derive(Debug, Parser)]
+#[derive(Debug, Args)]
 pub struct DeleteOpts {
     #[arg(short, long)]
     pub id: u64,
 }
 
-#[derive(Debug, Parser)]
+#[derive(Debug, Args)]
 pub struct MoveOpts {
     #[arg(short, long)]
     pub id: u64,
@@ -24,7 +24,7 @@ pub struct MoveOpts {
     pub status: String,
 }
 
-#[derive(Debug, Parser)]
+#[derive(Debug, Args)]
 pub struct ListOpts {
     #[arg(short, long)]
     pub sort: String,

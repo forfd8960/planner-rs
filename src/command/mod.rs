@@ -4,7 +4,7 @@ use options::{CreateOpts, DeleteOpts, ListOpts, MoveOpts};
 pub mod options;
 
 #[derive(Debug, Parser)]
-#[command(name="task-planner", version, author, about, long_about = None)]
+#[command(name="task-planner", version, author, about="What Todo Next?", long_about = None)]
 pub struct Options {
     #[command(subcommand)]
     pub cmd: SubCommand,
