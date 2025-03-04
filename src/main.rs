@@ -1,25 +1,27 @@
 use clap::Parser;
-use planner::command::{Options, SubCommand};
+use planner::{
+    command::{Options, SubCommand},
+    handler::create,
+    model::TodoStore,
+};
 
-fn main() {
+fn main() -> Result<(), String> {
     let opts = Options::parse();
     println!("{:?}", opts);
-    handle_sub_commands(opts)
+
+    let mut todo_store = planner::model::TodoStore::load()?;
+    handle_sub_commands(opts, &mut todo_store)
 }
 
-fn handle_sub_commands(opts: Options) {
+fn handle_sub_commands(opts: Options, todo_store: &mut TodoStore) -> Result<(), String> {
     match opts.cmd {
         SubCommand::Create(opts) => {
-            planner::handler::create::create_todo(opts);
+            let todo = create::create_todo(opts, todo_store)?;
+            println!("created todo: {:?}", todo);
+            Ok(())
         }
-        SubCommand::List(opts) => {
-            planner::handler::list::list_todos(opts);
-        }
-        SubCommand::Delete(opts) => {
-            planner::handler::delete::delete_todo(opts);
-        }
-        SubCommand::Move(opts) => {
-            planner::handler::update::update_todo(opts);
-        }
+        SubCommand::List(opts) => Ok(()),
+        SubCommand::Delete(opts) => Ok(()),
+        SubCommand::Move(opts) => Ok(()),
     }
 }

@@ -1,3 +1,6 @@
+const TODO_FILE: &str = "todos.txt";
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct Todo {
     pub id: u64,
     pub name: String,
@@ -6,7 +9,19 @@ pub struct Todo {
     pub finish_date: String,
 }
 
-#[derive(Debug, PartialEq)]
+impl Default for Todo {
+    fn default() -> Self {
+        Todo {
+            id: 0,
+            name: "".to_string(),
+            desc: "".to_string(),
+            status: Status::PLAN,
+            finish_date: "".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Status {
     PLAN,
     TODO,
@@ -14,28 +29,145 @@ pub enum Status {
     DONE,
 }
 
-pub fn create_todo(todo: &Todo) -> Result<Todo, String> {
-    println!("create todo");
+pub struct TodoStore {
+    max_id: u64,
+    todos: Vec<Todo>,
+}
+
+impl TodoStore {
+    pub fn new(max_id: u64, todos: Vec<Todo>) -> Self {
+        TodoStore { max_id, todos }
+    }
+
+    pub fn load() -> Result<Self, String> {
+        let todos = load_todos()?;
+        let max_id = todos.iter().map(|t| t.id).max().unwrap_or(0);
+        Ok(TodoStore::new(max_id, todos))
+    }
+
+    pub fn create(&mut self, todo: &Todo) -> Result<Todo, String> {
+        let new_todo = gen_todo(self.max_id, todo)?;
+        self.todos.push(new_todo.clone());
+        self.max_id += 1;
+        Ok(new_todo)
+    }
+
+    pub fn delete(&mut self, todo_id: u64) -> Result<(), String> {
+        println!("delete todo: {}", todo_id);
+        self.todos.retain(|t| t.id != todo_id);
+        Ok(())
+    }
+
+    pub fn update_status(&mut self, todo_id: u64, target_status: Status) -> Result<(), String> {
+        println!("move todo: {} to: {:?}", todo_id, target_status);
+
+        self.todos.iter_mut().for_each(|t| {
+            if t.id == todo_id {
+                t.status = target_status;
+            }
+        });
+        Ok(())
+    }
+
+    pub fn list(&self) -> Result<Vec<Todo>, String> {
+        Ok(self.todos.clone())
+    }
+
+    pub fn save(&self) -> Result<(), String> {
+        let content = self
+            .todos
+            .iter()
+            .map(|t| encode_todo(t))
+            .collect::<Vec<String>>()
+            .join("\n");
+        std::fs::write(TODO_FILE, content).map_err(|e| e.to_string())?;
+        Ok(())
+    }
+}
+
+pub fn encode_todo(todo: &Todo) -> String {
+    let bottom_line = "=".repeat(30);
+    format!(
+        "id: {}\nname: {}\ndesc: {}\nstatus: {:?}\nfinish_date: {}\n{}",
+        todo.id, todo.name, todo.desc, todo.status, todo.finish_date, bottom_line
+    )
+}
+
+pub fn decode_todo(todo_str: &str) -> Result<Todo, String> {
+    let mut lines = todo_str.lines();
+    let id = lines
+        .next()
+        .and_then(|l| l.split(": ").nth(1))
+        .and_then(|id| id.parse::<u64>().ok())
+        .unwrap_or(0);
+
+    let name = lines
+        .next()
+        .and_then(|l| l.split(": ").nth(1))
+        .unwrap_or("");
+
+    let desc = lines
+        .next()
+        .and_then(|l| l.split(": ").nth(1))
+        .unwrap_or("");
+
+    let status = lines
+        .next()
+        .and_then(|l| l.split(": ").nth(1))
+        .and_then(|s| match s {
+            "PLAN" => Some(Status::PLAN),
+            "TODO" => Some(Status::TODO),
+            "WIP" => Some(Status::WIP),
+            "DONE" => Some(Status::DONE),
+            _ => None,
+        })
+        .unwrap_or(Status::PLAN);
+
+    let finish_date = lines
+        .next()
+        .and_then(|l| l.split(": ").nth(1))
+        .unwrap_or("");
+
     Ok(Todo {
-        id: 1,
+        id,
+        name: name.to_string(),
+        desc: desc.to_string(),
+        status,
+        finish_date: finish_date.to_string(),
+    })
+}
+
+pub fn load_todos() -> Result<Vec<Todo>, String> {
+    let content = std::fs::read_to_string(TODO_FILE).map_err(|e| e.to_string())?;
+    let splitter = "=".repeat(30);
+    let encode_todos: Vec<&str> = content.split(&splitter).collect();
+
+    let todos = encode_todos
+        .iter()
+        .filter(|t| !t.is_empty())
+        .map(|t| {
+            decode_todo(t).unwrap_or_else(|e| {
+                eprintln!("decode todo error: {}", e);
+                Todo {
+                    id: 0,
+                    name: "".to_string(),
+                    desc: "".to_string(),
+                    status: Status::PLAN,
+                    finish_date: "".to_string(),
+                }
+            })
+        })
+        .collect();
+    Ok(todos)
+}
+
+pub fn gen_todo(max_id: u64, todo: &Todo) -> Result<Todo, String> {
+    println!("create todo: {:?}", todo);
+    Ok(Todo {
+        id: max_id + 1,
         name: todo.name.clone(),
         desc: todo.desc.clone(),
         status: Status::PLAN,
         finish_date: todo.finish_date.clone(),
     })
-}
-
-pub fn delete_todo(todo_id: u64) -> Result<(), String> {
-    println!("delete todo: {}", todo_id);
-    Ok(())
-}
-
-pub fn move_todo(todo_id: u64, target_state: Status) -> Result<(), String> {
-    println!("move todo: {} to: {:?}", todo_id, target_state);
-    Ok(())
-}
-
-pub fn list_todos() -> Result<Vec<Todo>, String> {
-    println!("list todos...");
-    Ok(vec![])
 }
