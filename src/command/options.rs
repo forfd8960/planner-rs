@@ -1,4 +1,4 @@
-use clap::{Args, Parser};
+use clap::Args;
 
 #[derive(Debug, Args)]
 pub struct CreateOpts {
@@ -26,10 +26,10 @@ pub struct MoveOpts {
 
 #[derive(Debug, Args)]
 pub struct ListOpts {
+    #[arg(long)]
+    pub sort: Option<String>,
+    #[arg(long)]
+    pub status: Option<String>,
     #[arg(short, long)]
-    pub sort: String,
-    #[arg(short, long)]
-    pub status: String,
-    #[arg(short, long)]
-    pub finsh_date: String,
+    pub finsh_date: Option<String>,
 }

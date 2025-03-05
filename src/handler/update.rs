@@ -1,7 +1,7 @@
 use crate::{command::options::MoveOpts, model::TodoStore};
 
 pub fn update_todo(todo_store: &mut TodoStore, opts: MoveOpts) -> Result<(), String> {
-    println!("update todo: {:?}", opts);
+    println!("update todo options: {:?}", opts);
 
     match opts.status.as_str().parse() {
         Ok(status) => {

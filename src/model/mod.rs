@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fs, str::FromStr};
 
 const TODO_FILE: &str = "todos.txt";
 
@@ -68,6 +68,7 @@ impl TodoStore {
         self.todos.iter_mut().for_each(|t| {
             if t.id == todo_id {
                 t.status = target_status;
+                println!("updated todo: {:?}", t);
             }
         });
         Ok(())
@@ -84,7 +85,8 @@ impl TodoStore {
             .map(|t| encode_todo(t))
             .collect::<Vec<String>>()
             .join("\n");
-        std::fs::write(TODO_FILE, content).map_err(|e| e.to_string())?;
+
+        fs::write(TODO_FILE, content).map_err(|e| e.to_string())?;
         Ok(())
     }
 }
@@ -98,7 +100,13 @@ pub fn encode_todo(todo: &Todo) -> String {
 }
 
 pub fn decode_todo(todo_str: &str) -> Result<Todo, String> {
-    let mut lines = todo_str.lines();
+    println!("decode todo str: {}", todo_str);
+
+    let trimmed = todo_str.trim();
+
+    println!("trimmed todo: {}", trimmed);
+
+    let mut lines = trimmed.lines();
     let id = lines
         .next()
         .and_then(|l| l.split(": ").nth(1))

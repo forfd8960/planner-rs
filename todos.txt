@@ -1,7 +1,7 @@
 id: 1
 name: learn rust
 desc: let's learn rust
-status: PLAN
+status: TODO
 finish_date: 2025-03-31
 ==============================
 id: 2
@@ -9,4 +9,10 @@ name: build rust tutorial
 desc: let's learn rust
 status: PLAN
 finish_date: 2025-03-31
+==============================
+id: 3
+name: build more rust tutorial
+desc: let's learn rust
+status: PLAN
+finish_date: 2025-05-31
 ==============================
