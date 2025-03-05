@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 const TODO_FILE: &str = "todos.txt";
 
 #[derive(Debug, PartialEq, Clone)]
@@ -15,6 +17,20 @@ pub enum Status {
     TODO,
     WIP,
     DONE,
+}
+
+impl FromStr for Status {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "PLAN" => Ok(Status::PLAN),
+            "TODO" => Ok(Status::TODO),
+            "WIP" => Ok(Status::WIP),
+            "DONE" => Ok(Status::DONE),
+            _ => Err(format!("{} is not valid status", s)),
+        }
+    }
 }
 
 pub struct TodoStore {

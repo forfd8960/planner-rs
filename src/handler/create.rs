@@ -3,7 +3,7 @@ use crate::{
     model::{Status, Todo, TodoStore},
 };
 
-pub fn create_todo(opts: CreateOpts, todo_store: &mut TodoStore) -> Result<Todo, String> {
+pub fn create_todo(todo_store: &mut TodoStore, opts: CreateOpts) -> Result<Todo, String> {
     println!("create todo: {:?}", opts);
 
     let new_todo = todo_store.create(&Todo {

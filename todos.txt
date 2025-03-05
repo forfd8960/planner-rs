@@ -4,3 +4,9 @@ desc: let's learn rust
 status: PLAN
 finish_date: 2025-03-31
 ==============================
+id: 2
+name: build rust tutorial
+desc: let's learn rust
+status: PLAN
+finish_date: 2025-03-31
+==============================
