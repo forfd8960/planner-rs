@@ -9,18 +9,6 @@ pub struct Todo {
     pub finish_date: String,
 }
 
-impl Default for Todo {
-    fn default() -> Self {
-        Todo {
-            id: 0,
-            name: "".to_string(),
-            desc: "".to_string(),
-            status: Status::PLAN,
-            finish_date: "".to_string(),
-        }
-    }
-}
-
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Status {
     PLAN,

@@ -1,0 +1,6 @@
+id: 1
+name: learn rust
+desc: let's learn rust
+status: PLAN
+finish_date: 2025-03-31
+==============================
