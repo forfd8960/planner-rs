@@ -126,13 +126,7 @@ pub fn decode_todo(todo_str: &str) -> Result<Todo, String> {
     let status = lines
         .next()
         .and_then(|l| l.split(": ").nth(1))
-        .and_then(|s| match s {
-            "PLAN" => Some(Status::PLAN),
-            "TODO" => Some(Status::TODO),
-            "WIP" => Some(Status::WIP),
-            "DONE" => Some(Status::DONE),
-            _ => None,
-        })
+        .and_then(|s| Some(s.parse().unwrap_or(Status::PLAN)))
         .unwrap_or(Status::PLAN);
 
     let finish_date = lines
